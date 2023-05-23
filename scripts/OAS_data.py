@@ -1,6 +1,6 @@
 from threading import Lock
 
-class OAS_Data:
+class OAS_data:
 
     contro_data = []
     autono_data = []
@@ -11,9 +11,9 @@ class OAS_Data:
             self.autono_data = [0,0,0,0,0,0]
             self.obstac_data = [0,0,0]
         
-            contro_lock = Lock()
-            autono_lock = Lock()
-            obstac_lock = Lock()
+            self.contro_lock = Lock()
+            self.autono_lock = Lock()
+            self.obstac_lock = Lock()
 
     def getControlData(self):
         with self.contro_lock:

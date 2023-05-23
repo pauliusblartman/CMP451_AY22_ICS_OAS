@@ -4,7 +4,7 @@ import time
 import RPi.GPIO as GPIO
 import OAS_data as data
 
-
+GPIO.setmode(GPIO.BOARD)
 
 #set GPIO Pins
 #GPIO_TRIGGER = 11
@@ -161,7 +161,7 @@ def distance(i):
 
 def main(top : data):
 #GPIO Mode (BOARD / BCM)
-    GPIO.setmode(GPIO.BOARD)
+
     sensors_to_test = [GPIO_TRIGGER1, GPIO_TRIGGER2, GPIO_TRIGGER3, GPIO_TRIGGER4, GPIO_TRIGGER5, GPIO_TRIGGER6]
     try:
         #print ("Object Detected by Sensor ")
@@ -185,5 +185,5 @@ def main(top : data):
 
 
 if __name__ == '__main__':
-    top = data()
+    top = data.OAS_data()
     main(top)

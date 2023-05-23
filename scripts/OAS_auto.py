@@ -2,7 +2,6 @@ from decimal import Clamped
 from enum import Enum
 from math import atan2, sqrt
 from os import wait
-from simple_pid import PID
 import OAS_data as data
 
 
@@ -17,7 +16,7 @@ class CoStatelor(Enum):
 
     avoid = 3
 
-state = Enum('State', ['idle', 'deadOn', 'avoid'])
+state = 'idle'
 
 ### END ###
 
@@ -40,11 +39,11 @@ MAX_SPEED = 0.25
 running = True
 
 # local accessors for getting individual data
-currX, currY, currAZ = 0
-targX, targY, targAZ = 0
+currX = currY = currAZ = 0
+targX = targY = targAZ = 0
 
 # local vars for 
-isDet, detAng, detDist = 0
+isDet = detAng = detDist = 0
 
 top : data
 ## END ##
@@ -66,7 +65,7 @@ def turnTowards():
     # If theres a large difference in between the target and current angle, then 
     while (abs(angleDiffer) > MAX_ANGLE_DIFF):
         angleDiffer = (currAZ - getAngleToTarget())
-        top.setConotrlData(0, Clamped(angleDiffer * 0.5 / MAX_TURN_ANGLE,-1,1))
+        top.setControlData(0, Clamped(angleDiffer * 0.5 / MAX_TURN_ANGLE,-1,1))
     return
 
 def deadOn():
@@ -89,7 +88,7 @@ def deadOn():
         return 0
 
 def avoid():
-    top.setConotrlData(0, 0)  
+    top.setControlData(0, 0)  
     wait(500)
     return
 
@@ -103,25 +102,24 @@ def main(_top : data):
     top = _top
 
     while(running):
-        match state:
-            case 'idle':
-                print("idling")
-                wait(0.5)
-            case 'turn':
-                turnTowards()
-                state = 'deadOn'
-            case 'deadOn':
-                if (deadOn() == 1):
-                    state = 'avoid'
-                else:
-                    state = 'idle'
-            case 'avoid':
-                avoid()
-                state = 'deadOn'
+        if( state == 'idle'):
+            print("idling")
+            wait(0.5)
+        elif( state == 'turn'):
+            turnTowards()
+            state = 'deadOn'
+        elif( state == 'deadOn'):
+            if (deadOn() == 1):
+                state = 'avoid'
+            else:
+                state = 'idle'
+        elif( state == 'avoid'):
+            avoid()
+            state = 'deadOn'
 
 
 if __name__ == '__main__':
-    top = data()
+    top = data.OAS_data()
     main(top)
 
 ### END ###

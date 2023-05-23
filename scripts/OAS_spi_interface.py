@@ -9,13 +9,14 @@ import OAS_data as data
 cs_proc = 18
 veh_proc = 22
 auto = 24
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(cs_proc, GPIO.OUT)
+GPIO.setup(veh_proc, GPIO.OUT)
+GPIO.setup(auto, GPIO.IN)
 
 def main(top : data):
 
-    GPIO.setmode(GPIO.BOARD)
-    GPIO.setup(cs_proc, GPIO.OUT)
-    GPIO.setup(veh_proc, GPIO.OUT)
-    GPIO.setup(auto, GPIO.IN)
+
 
     spi = spidev.SpiDev()
     spi.open(0, 0)
@@ -61,6 +62,10 @@ def main(top : data):
                 #struct.unpack("%f", tubb2[0:3])
                 print("In 1: ", tvalue2)
                 print("In 2: ", tvalue3)
+                
+                controlData = [tvalue2, tvalue3]
+                
+                top.setControlData(controlData)
                 #print(tvalue)
             GPIO.output(cs_proc, True)
             time.sleep(0.0001)
@@ -134,5 +139,5 @@ def main(top : data):
         GPIO.output(veh_proc, True)
 
 if __name__ == '__main__':
-    top = data()
+    top = data.OAS_data()
     main(top)
