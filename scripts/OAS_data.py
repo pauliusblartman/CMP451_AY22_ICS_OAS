@@ -9,7 +9,7 @@ class OAS_data:
     def __init__(self):
             self.contro_data = [0,0]
             self.autono_data = [0,0,0,0,0,0]
-            self.obstac_data = [0,0,0]
+            self.obstac_data = [ 0, 0, 0, 0, 0, 0]
         
             self.contro_lock = Lock()
             self.autono_lock = Lock()

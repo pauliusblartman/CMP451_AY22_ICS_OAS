@@ -31,6 +31,8 @@ def main():
         print(top.getAutonomousData())
         print("Provided Autonomous Values")
         print(top.getAutonomousData())
+        print("Sensor stuff")
+        print(top.getDetectionData())
 
 if __name__ == "__main__":
     main()
