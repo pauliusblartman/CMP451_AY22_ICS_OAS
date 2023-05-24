@@ -35,6 +35,6 @@ class OAS_data:
         with self.obstac_lock:
             return self.autono_lock
         
-    def setDetecctionData(self,_obstac_data):
+    def setDetectionData(self,_obstac_data):
         with self.obstac_lock:
             self.obstac_data = _obstac_data

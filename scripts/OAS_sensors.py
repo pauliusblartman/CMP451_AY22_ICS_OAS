@@ -171,7 +171,7 @@ def main(top : data):
             for sensor in sensors_to_test:
                 dist = distance(i)
                 print ("Object Detected by Sensor " + str(i) + " Measured Distance = %.1f cm" % dist)
-                if(dist <400):
+                if(dist < 400):
                     print("Object should be avoided")
                 i = i + 1
                 time.sleep(.1)

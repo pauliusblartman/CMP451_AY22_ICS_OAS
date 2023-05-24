@@ -122,7 +122,7 @@ def main(top : data):
             print("In 4: ", tvalue5)
             print("In 5: ", tvalue6)
             print("In 6: ", tvalue7)
-            autoData = [tvalue2, tvalue2, tvalue2, tvalue2, tvalue2, tvalue2]
+            autoData = [tvalue2, tvalue3, tvalue4, tvalue5, tvalue6, tvalue7]
             top.setAutonomousData(autoData)
             #print(tvalue)
         GPIO.output(cs_proc, True)
