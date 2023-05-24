@@ -66,7 +66,7 @@ def getAutoValues():
     if (shouldAvoid == True):
         targX, targY, targAZ = autoData[2:5]
         
-    currAZ = autoData[5] 
+    currAZ = autoData[5] - 180
     
     #print ("cuuAZ: ", currAZ, " expected AZ", autoData[5] )
 
@@ -81,7 +81,7 @@ def getAngleToTarget():
 
 def getDistanceToTarget():
     global currX, currY, currAZ, targX, targY, targAZ, shouldAvoid, top
-    return sqrt((currX - targX)^2 + (currY - targY)^2)
+    return sqrt(pow(currX - targX,2) + pow(currY - targY,2))
 
 
 currAccel = 0
@@ -89,6 +89,7 @@ currVel = 0
 
 def generateMotorCommand(forwPow, turnPow):
     #top.setControlData(Clamped(angleDiffer * 0.5 / MAX_TURN_ANGLE,-1,1), turnDirection)
+    top.setControlData([np.clip(angleDiffer * 0.0 / 180,-0.5,0.5), turnDirection])
     pass
 
 def turnTowards():
@@ -97,7 +98,9 @@ def turnTowards():
 
     angleDiffer = (currAZ - getAngleToTarget())
 
-    #print ("[AUTO]: Current Angle ", currAZ)
+    print ("[AUTO]: Current Angle ", currAZ)
+    
+    print ("[AUTO]: Target Angle ", getAngleToTarget())
     
     print ("[AUTO]: Current Angle Diff", angleDiffer)
 
@@ -105,24 +108,36 @@ def turnTowards():
     if (abs(angleDiffer) > MAX_ANGLE_DIFF):
         angleDiffer = (currAZ - getAngleToTarget())
         turnDirection = 1 if angleDiffer > 0 else -1
-        top.setControlData([np.clip(angleDiffer * 0.1 / MAX_TURN_ANGLE,-0.4,0.4), turnDirection])
+        #top.setControlData([np.clip(angleDiffer * 0.0 / 180,-0.5,0.5), turnDirection])
+        top.setControlData(0.5, turnDirection])
         return 1
     else:
         return 0
 
+
+startDist = 0
+
 def deadOn():
 
-    global currX, currY, currAZ, targX, targY, targAZ, shouldAvoid, top
+    global currX, currY, currAZ, targX, targY, targAZ, shouldAvoid, top, startDist
 
     dist = getDistanceToTarget()
+
+    if (startDist == 0):
+        startDist = dist
 
     if (dist > MAX_DIST_DIFF):
         dist = getDistanceToTarget()
 
-        top.setControlData([0, np.clip(dist * 0.1 / MAX_TURN_ANGLE,0,1)])  
+        top.setControlData(0.5,0])  
         
         # check if an obstacle was detected
         detection = top.getDetectionData()
+        
+        if (dist - startDist > 2):
+            startDist = 0
+            return 3
+        
         # don't pay attantion to detections that aren't in front of you
         detection = detection[3:4]
         for range in detection:
@@ -174,6 +189,7 @@ def main(_top : data.OAS_data):
     
     shouldAvoid = False
 
+
     while(running):
         getAutoValues()
         if( state == 'idle'):
@@ -198,6 +214,9 @@ def main(_top : data.OAS_data):
                     state = 'idle'
             elif (rv == 2):
                 state = 'avoid'
+            elif (rv == 3):
+                state = 'turn'
+                time.sleep(0.5)
         elif( state == 'avoid'):
             print("avoid it")
             avoid()

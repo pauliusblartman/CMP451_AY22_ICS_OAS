@@ -26,8 +26,8 @@ def main():
     inteT.start()
     while(True):
         time.sleep(0.1)
-        print("Provided Control Values")
-        print(top.getControlData())
+        #print("Provided Control Values")
+        #print(top.getControlData())
     #    print("Provided Autonomous Values")
     #    print(top.getAutonomousData())
     #    print("Sensor stuff")
