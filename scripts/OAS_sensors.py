@@ -171,7 +171,7 @@ def main(top : data):
             detRanges = [] # tuple for holding detection data
             for sensor in sensors_to_test:
                 dist = distance(i)
-                #print ("Object Detected by Sensor " + str(i) + " Measured Distance = %.1f cm" % dist)
+                print ("Object Detected by Sensor " + str(i) + " Measured Distance = %.1f cm" % dist)
                 detRanges = detRanges + [dist]
                 if(dist < 400):
                     #print("Object should be avoided")

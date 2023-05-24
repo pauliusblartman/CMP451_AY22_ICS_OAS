@@ -109,7 +109,7 @@ def turnTowards():
         angleDiffer = (currAZ - getAngleToTarget())
         turnDirection = 1 if angleDiffer > 0 else -1
         #top.setControlData([np.clip(angleDiffer * 0.0 / 180,-0.5,0.5), turnDirection])
-        top.setControlData([0.25, turnDirection])
+        top.setControlData([0.5, turnDirection])
         return 1
     else:
         return 0
@@ -129,7 +129,7 @@ def deadOn():
     if (dist > MAX_DIST_DIFF):
         dist = getDistanceToTarget()
 
-        top.setControlData([0.3,0])  
+        top.setControlData([0.6,0])  
         
         # check if an obstacle was detected
         detection = top.getDetectionData()

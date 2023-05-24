@@ -63,7 +63,7 @@ def main(top : data):
                 print("In 1: ", tvalue2)
                 print("In 2: ", tvalue3)
                 
-                controlData = [tvalue2, tvalue3]
+                controlData = [tvalue2[0], tvalue3[0]]
                 
                 top.setControlData(controlData)
                 #print(tvalue)
@@ -134,6 +134,9 @@ def main(top : data):
         value2 = .8
         
         powFor, powTur = top.getControlData()
+        
+        print("powFor: ", powFor)
+        print("powTur: ", powTur)
     
         
         powForB = bytearray(struct.pack("f",float(powFor)))
