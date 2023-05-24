@@ -24,7 +24,7 @@ def main(top : data):
     spi.mode = 0b00
 
     while True:    
-        print("Hi")
+        #print("Hi")
         autopin = GPIO.input(auto)
     # GPIO.output(cs_proc, False)
         #tubby = spi.readbytes(4)
@@ -36,7 +36,7 @@ def main(top : data):
         #    tubby = spi.readbytes(4)
         #    GPIO.output(cs_proc, True)
 
-        print("wasnt")
+        #print("wasnt")
         if(autopin != 1):
             print("auto != 1")
             tubby = [0]
@@ -93,7 +93,7 @@ def main(top : data):
             time.sleep(.0001)
             GPIO.output(cs_proc, False)
             time.sleep(.0001)
-            print(tubby)
+            #print(tubby)
             #time.sleep(.020)
             if tubby != [0]:
                 tubb2 = spi.readbytes(4)
@@ -116,13 +116,13 @@ def main(top : data):
                 tvalue6 = struct.unpack("f", ba5)
                 tvalue7 = struct.unpack("f", ba6)
                 #struct.unpack("%f", tubb2[0:3])
-            print("In 1: ", tvalue2)
-            print("In 2: ", tvalue3)
-            print("In 3: ", tvalue4)
-            print("In 4: ", tvalue5)
-            print("In 5: ", tvalue6)
-            print("In 6: ", tvalue7)
-            autoData = [tvalue2, tvalue3, tvalue4, tvalue5, tvalue6, tvalue7]
+            #print("In 1: ", tvalue2)
+            #print("In 2: ", tvalue3)
+            #print("In 3: ", tvalue4)
+            #print("In 4: ", tvalue5)
+            #print("In 5: ", tvalue6)
+            #print("In 6: ", tvalue7)
+            autoData = [tvalue2[0], tvalue3[0], tvalue4[0], tvalue5[0], tvalue6[0], tvalue7[0]]
             top.setAutonomousData(autoData)
             #print(tvalue)
         GPIO.output(cs_proc, True)
@@ -132,10 +132,23 @@ def main(top : data):
         value = -.1
         baf = bytearray(ba)
         value2 = .8
-        spi.writebytes(baf)
+        
+        powFor, powTur = top.getControlData()
+    
+        
+        powForB = bytearray(struct.pack("f",float(powFor)))
+        powTurB = bytearray(struct.pack("f",float(powTur)))
+        
+        #print("ba pow ", powForB)
+        #print("ba Tur", powTurB)
+        
+        spi.writebytes(powForB)
+        spi.writebytes(powTurB)
+        
+        #spi.writebytes(baf)
         #ba = bytearray(struct.pack("f", tvalue2))
         baf = bytearray(ba2)
-        spi.writebytes(baf)
+        #spi.writebytes(baf)
         GPIO.output(veh_proc, True)
 
 if __name__ == '__main__':

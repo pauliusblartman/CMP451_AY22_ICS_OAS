@@ -4,7 +4,7 @@ class OAS_data:
 
     contro_data = []
     autono_data = []
-    obstacle_detection = []
+    obstac_data = []
 
     def __init__(self):
             self.contro_data = [0,0]
@@ -33,7 +33,7 @@ class OAS_data:
 
     def getDetectionData(self):
         with self.obstac_lock:
-            return self.autono_lock
+            return self.obstac_data
         
     def setDetectionData(self,_obstac_data):
         with self.obstac_lock:

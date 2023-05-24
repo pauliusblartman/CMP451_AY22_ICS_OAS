@@ -1,7 +1,9 @@
 from decimal import Clamped
 from enum import Enum
 from math import atan2, sqrt
+import numpy as np
 from os import wait
+import time
 import OAS_data as data
 
 
@@ -45,9 +47,9 @@ currX = currY = currAZ = 0
 targX = targY = targAZ = 0
 
 # local vars for 
-isDet = detAng = detDist = 0
+#isDet = detAng = detDist = 0
 
-top : data
+top : data.OAS_data
 ## END ##
 ### END ###
 
@@ -55,50 +57,69 @@ top : data
 
 def getAutoValues():
     
-    autoData = top.getAutonomousData()
+    global currX, currY, currAZ, targX, targY, targAZ, shouldAvoid, top
     
-    currX, currY , currAZ = autoData[0:2]
+    autoData = top.getAutonomousData()
+    #print ("[AUTO]: Gotten Auto Data ", autoData)
+    currX, currY  = autoData[0:2]
 
     if (shouldAvoid == True):
-        targX, targY, targAZ = autoData[3:5]
+        targX, targY, targAZ = autoData[2:5]
+        
+    currAZ = autoData[5] 
+    
+    #print ("cuuAZ: ", currAZ, " expected AZ", autoData[5] )
 
     # local vars for 
-    isDet, detAng, detDist = top.getDetectionData()
+    #isDet, detAng, detDist = top.getDetectionData()
 
 def getAngleToTarget():
-    return currAZ - atan2(currX - targX, currY - targY)
+    global currX, currY, currAZ, targX, targY, targAZ, shouldAvoid, top
+    diff = np.rad2deg(atan2(currX - targX, currY - targY))
+    
+    return diff
 
 def getDistanceToTarget():
+    global currX, currY, currAZ, targX, targY, targAZ, shouldAvoid, top
     return sqrt((currX - targX)^2 + (currY - targY)^2)
 
 
 currAccel = 0
 currVel = 0
+
 def generateMotorCommand(forwPow, turnPow):
     #top.setControlData(Clamped(angleDiffer * 0.5 / MAX_TURN_ANGLE,-1,1), turnDirection)
     pass
 
 def turnTowards():
 
+    global currX, currY, currAZ, targX, targY, targAZ, shouldAvoid, top
+
     angleDiffer = (currAZ - getAngleToTarget())
+
+    #print ("[AUTO]: Current Angle ", currAZ)
+    
+    print ("[AUTO]: Current Angle Diff", angleDiffer)
 
     # If theres a large difference in between the target and current angle, then 
     if (abs(angleDiffer) > MAX_ANGLE_DIFF):
         angleDiffer = (currAZ - getAngleToTarget())
         turnDirection = 1 if angleDiffer > 0 else -1
-        top.setControlData(Clamped(angleDiffer * 0.5 / MAX_TURN_ANGLE,-1,1), turnDirection)
+        top.setControlData([np.clip(angleDiffer * 0.1 / MAX_TURN_ANGLE,-0.4,0.4), turnDirection])
         return 1
     else:
         return 0
 
 def deadOn():
 
+    global currX, currY, currAZ, targX, targY, targAZ, shouldAvoid, top
+
     dist = getDistanceToTarget()
 
     if (dist > MAX_DIST_DIFF):
         dist = getDistanceToTarget()
 
-        top.setConotrlData(0, Clamped(dist * 0.1 / MAX_TURN_ANGLE,0,1))  
+        top.setControlData([0, np.clip(dist * 0.1 / MAX_TURN_ANGLE,0,1)])  
         
         # check if an obstacle was detected
         detection = top.getDetectionData()
@@ -114,6 +135,9 @@ def deadOn():
         return 0
 
 def avoid():
+    
+    global currX, currY, currAZ, targX, targY, targAZ, shouldAvoid, top
+    
     #currX, currY , currAZ, targX, targY, targAZ
     # check if an obstacle was detected
     detection = top.getDetectionData()
@@ -131,7 +155,7 @@ def avoid():
         #targX = Axcosθ+Aysinθ
         #targY = −Axsinθ+Aycosθ
         pass
-    wait(500)
+    time.sleep(500)
     return
 
 ### END ###
@@ -139,24 +163,32 @@ def avoid():
 ### MAIN ###
 
 #main loop of code
-def main(_top : data):
-
+def main(_top : data.OAS_data):
+    
+    global currX, currY, currAZ, targX, targY, targAZ, shouldAvoid, top
+    
     top = _top
+    
 
-    getAutoValues()
+    state = 'idle'
+    
+    shouldAvoid = False
 
     while(running):
+        getAutoValues()
         if( state == 'idle'):
             print("idling")
-            if (getDistanceToTarget):
-                state = 'turn'
-            wait(0.5)
+            #if (getDistanceToTarget() > MAX_DIST_DIFF):
+            state = 'turn'
+            time.sleep(0.5)
         elif( state == 'turn'):
+            print("turning")
             if(turnTowards() == 0):
-                top.setControlData(0,0)
-                wait(1)
+                top.setControlData([0,0])
+                time.sleep(1)
                 state = 'deadOn'
         elif( state == 'deadOn'):
+            print("striaghting")
             rv = deadOn()
             if (rv == 0):
                 if (shouldAvoid):
@@ -167,10 +199,12 @@ def main(_top : data):
             elif (rv == 2):
                 state = 'avoid'
         elif( state == 'avoid'):
+            print("avoid it")
             avoid()
             state = 'turn'
-
-
+        else:
+            state = 'idle'
+        time.sleep(0.1)
 if __name__ == '__main__':
     top = data.OAS_data()
     main(top)

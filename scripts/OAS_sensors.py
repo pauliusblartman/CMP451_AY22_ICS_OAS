@@ -171,10 +171,11 @@ def main(top : data):
             detRanges = [] # tuple for holding detection data
             for sensor in sensors_to_test:
                 dist = distance(i)
-                print ("Object Detected by Sensor " + str(i) + " Measured Distance = %.1f cm" % dist)
-                detRanges = detRanges + dist
+                #print ("Object Detected by Sensor " + str(i) + " Measured Distance = %.1f cm" % dist)
+                detRanges = detRanges + [dist]
                 if(dist < 400):
-                    print("Object should be avoided")
+                    #print("Object should be avoided")
+                    pass
                 i = i + 1
                 time.sleep(.1)
             top.setDetectionData(detRanges)
@@ -183,10 +184,10 @@ def main(top : data):
 
 # Reset by pressing CTRL + C
     except KeyboardInterrupt:
-        print("Measurement stopped by User")
+        #print("Measurement stopped by User")
         GPIO.cleanup()
 
 
 if __name__ == '__main__':
-    top = data.OAS_data()
-    main(top)
+    _top = data.OAS_data()
+    main(_top)
